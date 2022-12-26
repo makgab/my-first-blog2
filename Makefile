@@ -1,40 +1,52 @@
-APP = 
-BIN_LINUX = ./bin/$(APP)
-CMD_SRC = ./cmd/$(APP)/main.go
+#
+# podman, docker
+#
 
-build: 
+
+#
+# variables:
+#
+APP = python3 manage.py runserver
+IMAGE = blog-django
+
+
+# ------------------------------------------------------------------------------------------
+# targets:
+#
+build:
 	echo "No need build in Python :)"
 
-run: build
-	$(BIN_LINUX) --address 127.0.0.1 --port 8081
+run:
+	$(APP)
 
 clean:
 	echo "No need clean in Python :)"
 
 # Docker-specific targets
 local-docker-build:
-	docker build -t localhost/$(APP):dev .
+	podman build -t localhost/$(IMAGE):dev .
 
 local-docker-run:
-	docker run --rm localhost/$(APP):dev
+	podman run --rm localhost/$(IMAGE):dev
 
 # GCloud-specific targets
 gcloud-docker-init:
 	gcloud auth configure-docker
 
 gcloud-docker-build:
-	docker build -t gcr.io/$(GCP_PROJECT_ID)/$(APP):$(ENVIRONMENT) .
+	docker build -t gcr.io/$(GCP_PROJECT_ID)/$(IMAGE):$(ENVIRONMENT) .
 
 gcloud-docker-push:
-	docker push gcr.io/$(GCP_PROJECT_ID)/$(APP):$(ENVIRONMENT)
+	docker push gcr.io/$(GCP_PROJECT_ID)/$(IMAGE):$(ENVIRONMENT)
 
 gcloud-run-deploy:
 	gcloud run deploy $(APP)-$(ENVIRONMENT) \
 	--region europe-west2 \
-	--image gcr.io/$(GCP_PROJECT_ID)/$(APP):$(ENVIRONMENT) \
+	--image gcr.io/$(GCP_PROJECT_ID)/$(IMAGE):$(ENVIRONMENT) \
 	--port 80 \
 	--project $(GCP_PROJECT_ID) \
 	--max-instances 1 \
 	--platform managed \
 	--labels environment=$(ENVIRONMENT) \
 	--allow-unauthenticated 
+
