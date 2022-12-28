@@ -5,8 +5,9 @@
 #
 # variables:
 #
-APP = python3 manage.py runserver
+APPRUN = python3 manage.py runserver
 IMAGE = blog-django
+APP = blog-django
 PORT = 8080
 ENVIRONMENT = production
 
@@ -17,7 +18,7 @@ build:
 	echo "No need build in Python :)"
 
 run:
-	$(APP)
+	$(APPRUN) 0:$(PORT)
 
 clean:
 	echo "No need clean in Python :)"
@@ -37,17 +38,23 @@ local-docker-run:
 # GCloud-specific targets --------------------------------------------------------------------
 gcloud-docker-init:
 	gcloud auth configure-docker
+# maybe need in local once:
+# gcloud init
+# glcoud auth login
+# gcloud config set project PROJECT_ID
 
+# GCP Container Registry service:
 gcloud-docker-build:
-	docker build -t gcr.io/$(GCP_PROJECT_ID)/$(IMAGE):$(ENVIRONMENT) .
+	docker build -t gcr.io/$(GCP_PROJECT_ID)/$(APP):$(ENVIRONMENT) .
 
 gcloud-docker-push:
-	docker push gcr.io/$(GCP_PROJECT_ID)/$(IMAGE):$(ENVIRONMENT)
+	docker push gcr.io/$(GCP_PROJECT_ID)/$(APP):$(ENVIRONMENT)
 
+# Google GCP Cloud Run service:
 gcloud-run-deploy:
 	gcloud run deploy $(APP)-$(ENVIRONMENT) \
 	--region europe-west2 \
-	--image gcr.io/$(GCP_PROJECT_ID)/$(IMAGE):$(ENVIRONMENT) \
+	--image gcr.io/$(GCP_PROJECT_ID)/$(APP):$(ENVIRONMENT) \
 	--port $(PORT) \
 	--project $(GCP_PROJECT_ID) \
 	--max-instances 1 \
