@@ -1,14 +1,14 @@
 #
-# podman, docker
+# podman, docker, Blog django app
 #
-
 
 #
 # variables:
 #
 APP = python3 manage.py runserver
 IMAGE = blog-django
-
+PORT = 8080
+ENVIRONMENT = production
 
 # ------------------------------------------------------------------------------------------
 # targets:
@@ -22,14 +22,19 @@ run:
 clean:
 	echo "No need clean in Python :)"
 
-# Docker-specific targets
+
+# Docker-specific targets -------------------------------------------------------------------
 local-docker-build:
+# docker build -t localhost/$(IMAGE):dev .
 	podman build -t localhost/$(IMAGE):dev .
 
-local-docker-run:
-	podman run --rm localhost/$(IMAGE):dev
 
-# GCloud-specific targets
+local-docker-run:
+# docker run -it --rm --name django --hostname django -p $(PORT):$(PORT) localhost/$(IMAGE):dev
+	podman run -it --rm --name django --hostname django -p $(PORT):$(PORT) localhost/$(IMAGE):dev
+
+
+# GCloud-specific targets --------------------------------------------------------------------
 gcloud-docker-init:
 	gcloud auth configure-docker
 
@@ -43,7 +48,7 @@ gcloud-run-deploy:
 	gcloud run deploy $(APP)-$(ENVIRONMENT) \
 	--region europe-west2 \
 	--image gcr.io/$(GCP_PROJECT_ID)/$(IMAGE):$(ENVIRONMENT) \
-	--port 80 \
+	--port $(PORT) \
 	--project $(GCP_PROJECT_ID) \
 	--max-instances 1 \
 	--platform managed \
