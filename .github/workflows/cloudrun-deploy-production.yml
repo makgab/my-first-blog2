@@ -13,8 +13,7 @@ jobs:
 
       - name: 'Setup GCP Service Account'
         # uses: google-github-actions/setup-gcloud@main
-        # uses: google-github-actions/setup-gcloud@v1
-        uses: google-github-actions/auth
+        uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_SECRET }}
