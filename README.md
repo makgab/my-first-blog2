@@ -11,4 +11,3 @@ requirements:
 
   * Django 4.x
 
-
